@@ -13,9 +13,10 @@ class Install extends Component {
           <p>Use npm:</p>
           <div class='code'>
             <code>
-              $ npm install omusubi
+              $ npm install boke0/omusubi
             </code>
           </div>
+          <!--
           <p>Or, use CDN:</p>
           <div class='code'>
             <code>
@@ -24,6 +25,7 @@ class Install extends Component {
               &lt;/script&gt;
             </code>
           </div>
+          -->
         </div>
       </div>
     `;
