@@ -45,7 +45,7 @@ module.exports = {
       [
         {
           context: 'img',
-          from: '**/*.json',
+          from: '**/*',
           to: `${__dirname}/dist`
         }
       ],
