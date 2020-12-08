@@ -1,4 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyFilePlugin = require('copy-webpack-plugin');
+const WriteFilePlugin = require('write-file-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
@@ -38,6 +40,17 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: true,
       template: `${__dirname}/index.html`
-    })
+    }),
+    new CopyFilePlugin(
+      [
+        {
+          context: 'img',
+          from: '**/*.json',
+          to: `${__dirname}/dist`
+        }
+      ],
+      {copyUnmodified: true}
+    ),
+    new WriteFilePlugin()
   ]
 }
