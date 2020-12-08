@@ -16,16 +16,14 @@ class Install extends Component {
               $ npm install omusubi-js
             </code>
           </div>
-          <!--
           <p>Or, use CDN:</p>
           <div class='code'>
             <code>
               &lt;script type='module'&gt;<br>
-                import {Component, html, defineComponent} from '//unpkg.com/omusubi/omusubi.min.js';<br>
+                import {Component, html, defineComponent} from '//unpkg.com/omusubi-js/omusubi.min.js';<br>
               &lt;/script&gt;
             </code>
           </div>
-          -->
         </div>
       </div>
     `;

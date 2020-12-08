@@ -54,17 +54,16 @@ defineComponent('fizz-buzz')(FizzBuzz);
 You can install this by using npm:
 
 ```bash
-$ npm install --save-dev boke0/omusubi
+$ npm install --save-dev omusubi-js
 ```
-<!--
+
 Or, you can use it by CDN:
 
 ```javascript
-import {Component, html, defineComponent} from '//unpkg.com/omusubi/omusubi.min.js';
+import {Component, html, defineComponent} from '//unpkg.com/omusubi-js/omusubi.min.js';
 
 ...
 ```
--->
 
 ## Features
 ### Cooperate with Vanilla
