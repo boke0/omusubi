@@ -41,16 +41,11 @@ module.exports = {
       inject: true,
       template: `${__dirname}/index.html`
     }),
-    new CopyFilePlugin(
-      [
-        {
-          context: 'img',
-          from: '**/*',
-          to: `${__dirname}/dist`
-        }
+    new CopyFilePlugin({
+      patterns: [
+        { from: "img", to: "img"},
       ],
-      {copyUnmodified: true}
-    ),
+    }),
     new WriteFilePlugin()
   ]
 }
