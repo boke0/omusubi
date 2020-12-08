@@ -33,7 +33,7 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: `${__dirname}`,
+    contentBase: `${__dirname}/dist`,
     port: 3031
   },
   plugins: [
