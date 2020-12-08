@@ -1,11 +1,11 @@
 Omusubi.js
 ===
 
-View component library using WebComponents.
-
 <div align='center'>
     <img src='https://user-images.githubusercontent.com/48381296/101445678-465e5700-3965-11eb-9e6e-d64e277fd457.png' width='200'/><br>
 </div>
+
+View component library using WebComponents.
 
 ## Usage
 
