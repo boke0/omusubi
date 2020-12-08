@@ -10,7 +10,7 @@ View component library using WebComponents.
 ## Usage
 
 ```javascript
-import {Component, html} from 'omusubi';
+import {Component, html, defineComponent} from 'omusubi';
 class FizzBuzz extends Component {
     init() {
         return {
@@ -28,7 +28,15 @@ class FizzBuzz extends Component {
             <button @click=${e => this.dispatch('update')}>Count!</button>
             <ul>
                 ${state.arr.map(i => html`
-                    <li>${i}</li>
+                    <li>${
+                        i % 15 == 0
+                        ? 'fizzbuzz'
+                        : i % 3 == 0
+                            ? 'fizz'
+                            : i % 5 == 0
+                                ? 'buzz'
+                                : i
+                    }</li>
                 `)}
             </ul>
         `
