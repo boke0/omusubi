@@ -1,10 +1,8 @@
 Omusubi.js
 ===
 
-<div align='center'>
-<img src='://raw.githubusercontent.com/boke0/omusubi/275fb110a90b49b7232a4b6926f47ab543ad2b1b/docs/img/omusubi.svg' width='200'/>
+![]('://raw.githubusercontent.com/boke0/omusubi/275fb110a90b49b7232a4b6926f47ab543ad2b1b/docs/img/omusubi.svg')
 View component library using WebComponents.
-</div>
 
 ## Usage
 
