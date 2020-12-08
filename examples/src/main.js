@@ -16,7 +16,7 @@ class TestComponent extends Component {
       <div id='he' @click=${e => this.dispatch('update')}>hhhhh</div>
       <ul>
         ${state.arr.map((_, i) => html`
-          <li>${
+          <li class=${
             i%15 == 0
               ?'fizzbuzz'
               : i%5 == 0
@@ -24,7 +24,17 @@ class TestComponent extends Component {
                 : i%3 == 0
                   ? 'fizz'
                   : i
-          }</li>
+            } data-id=${i%2==0?'even':'odd'}>
+          ${
+            i%15 == 0
+              ?'fizzbuzz'
+              : i%5 == 0
+                ? 'buzz'
+                : i%3 == 0
+                  ? 'fizz'
+                  : i
+            }
+          </li>
         `)}
       </ul>
     `;

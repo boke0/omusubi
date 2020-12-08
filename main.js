@@ -329,16 +329,8 @@ class Template extends RenderPart {
     for(const i in this.placeholder){
       const placeholder = this.placeholder[i];
       const {type, hash} = placeholder;
-      while(walker.nextNode()){
-        if(walker.currentNode instanceof Text) continue;
-        if(walker.currentNode instanceof Comment && walker.currentNode.data.trim() == 'node-'+hash+'-start'){
-          break;
-        }else if(type == 'attr' && walker.currentNode instanceof HTMLElement && walker.currentNode.hasAttribute('data-attr'+hash)) {
-          break;
-        }
-      }
       if(type == 'attr'){
-        const element = walker.currentNode;
+        const element = this.fragment.querySelector('[data-attr'+hash+']');
         const a = placeholder.attr;
         switch(a[0]) {
             case "@":
@@ -360,7 +352,12 @@ class Template extends RenderPart {
                 break;
         }
       }else{
-        walker.nextNode();
+        do{
+          if(walker.currentNode instanceof Text) continue;
+          if(walker.currentNode instanceof Comment && walker.currentNode.data.trim() == 'node-'+hash+'-start'){
+            break;
+          }
+        } while(walker.nextNode());
         const range = document.createRange();
         let current = walker.currentNode;
         let container = current.parentNode ? current.parentNode : this.fragment;
