@@ -1,7 +1,7 @@
 Omusubi.js
 ===
 
-![]('://raw.githubusercontent.com/boke0/omusubi/275fb110a90b49b7232a4b6926f47ab543ad2b1b/docs/img/omusubi.svg')
+![omusubi](https://user-images.githubusercontent.com/48381296/101445678-465e5700-3965-11eb-9e6e-d64e277fd457.png)
 View component library using WebComponents.
 
 ## Usage
