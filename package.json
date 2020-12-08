@@ -1,0 +1,24 @@
+{
+  "name": "omusubi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boke0/omusubi.git"
+  },
+  "keywords": [],
+  "author": "木瓜丸 <speken00.tt@gmail.com> (https://boke0.netlify.app)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/boke0/omusubi/issues"
+  },
+  "homepage": "https://github.com/boke0/omusubi#readme"
+}

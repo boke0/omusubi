@@ -11,6 +11,16 @@ function hash(str){
   return hash;
 }
 
+export function defineComponent(tagname, options) {
+  return function (wrapped) {
+    return customElements.define(
+      tagname,
+      wrapped,
+      options
+    )
+  }
+}
+
 export function html(strings, ...values){
   return new RawHTMLTagFuncOutput(strings, values)
 }
@@ -20,6 +30,9 @@ export class Component extends HTMLElement{
     super();
     this.attachShadow({mode: 'open'});
   }
+  static get styles() {
+    return [new CSSStyleSheet()];
+  }
   connectedCallback(){
     this.state = this.init();
     const {strings, values} = this.render(this.state);
@@ -27,6 +40,7 @@ export class Component extends HTMLElement{
       this.template = new Template(strings);
       this.shadowRoot.appendChild(this.template.fragment);
       this.template.fragment = this.shadowRoot;
+      this.shadowRoot.adoptedStyleSheets = this.constructor.styles;
     }
     this.template._update(...values);
   }
