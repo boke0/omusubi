@@ -13,7 +13,7 @@ class Install extends Component {
           <p>Use npm:</p>
           <div class='code'>
             <code>
-              $ npm install boke0/omusubi
+              $ npm install omusubi-js
             </code>
           </div>
           <!--

@@ -10,7 +10,7 @@ View component library using WebComponents.
 ## Usage
 
 ```javascript
-import {Component, html, defineComponent} from 'omusubi';
+import {Component, html, defineComponent} from 'omusubi-js';
 class FizzBuzz extends Component {
     init() {
         return {
