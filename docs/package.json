@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "constructable-style-loader": "^1.0.0-alpha.7",
+    "html-webpack-plugin": "^4.5.0",
     "postcss": "^8.1.14",
     "postcss-loader": "^4.1.0",
     "postcss-nested": "^5.0.2",
