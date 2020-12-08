@@ -1,5 +1,4 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
 
 module.exports = {
   entry: './src/main.js',
@@ -36,7 +35,6 @@ module.exports = {
     port: 3031
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
       template: `${__dirname}/index.html`
