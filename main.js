@@ -76,7 +76,6 @@ class TemplateValue extends Value {
   }
   update(args = null){
     if(args) this.args = args;
-    console.log(this.args);
     this.template._update(...(this.args));
   }
 }
@@ -154,7 +153,6 @@ class ValueArray {
     }
     let i=this.values.length;
     let j=value_arr.values.length;
-    console.log(this.values, value_arr.values);
     const new_temp = [];
     while(i>0 || j>0){
       const m = D[i][j].from[0];
@@ -162,16 +160,13 @@ class ValueArray {
       if(i-1 == m && j - 1 == n){
         i--;
         j--;
-        console.log('unchange')
         new_temp.unshift(this.values[i]);
         if(new_temp[0] instanceof TemplateValue) new_temp[0].update(value_arr.values[j].args);
       }else if(i-1 == m && j == n){
         i--;
-        console.log('remove', this.values[i])
         this.values[i].template.remove();
       }else if(i == m && j-1 == n){
         j--;
-        console.log('add', value_arr.values[j])
         if(new_temp.length == 0){
           const walker = document.createTreeWalker(this.container.fragment);
           do{
@@ -198,7 +193,6 @@ class ValueArray {
       }
     }
     this.values = new_temp;
-    console.log('diffing is done', this.values);
   }
 }
 
