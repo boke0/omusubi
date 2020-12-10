@@ -2,6 +2,9 @@ const FNV_OFFSET_BASIS_32 = 2166136261;
 const FNV_PRIME_32 = 16777619;
 
 function hash(str){
+  if(typeof str != 'string') {
+    str = String(str);
+  }
   let arr = new Uint16Array(str.length);
   for(let i = 0; i<arr.length; i++) arr[i] = str.charCodeAt(i);
   let hash = FNV_OFFSET_BASIS_32;
