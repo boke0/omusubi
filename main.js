@@ -289,7 +289,8 @@ class Template extends RenderPart {
         this.placeholder.push({
           hash: h,
           type: 'attr',
-          attr: attr
+          attr: attr,
+          value: null
         });
       }else if (i != strings.length - 1){
         //Nodeだった場合
@@ -334,7 +335,8 @@ class Template extends RenderPart {
         const a = placeholder.attr;
         switch(a[0]) {
             case "@":
-                element['on'+a.slice(1)] = values[i];
+                element.removeEventListener(a.slice(1), placeholder.value);
+                element.addEventListener(a.slice(1), value[i]);
                 break;
             case ".":
                 element[a.slice(1)] = values[i];
@@ -343,7 +345,7 @@ class Template extends RenderPart {
                 let attr = a.slice(1);
                 if(values[i]){
                     element.setAttribute(attr, '');
-                }else if(p.element.hasAttribute(attr)){
+                }else if(element.hasAttribute(attr)){
                     element.removeAttribute(attr);
                 }
                 break;
@@ -351,6 +353,7 @@ class Template extends RenderPart {
                 element.setAttribute(a, String(values[i]));
                 break;
         }
+        placeholder.value = value[i];
       }else{
         do{
           if(walker.currentNode instanceof Text) continue;
