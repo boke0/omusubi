@@ -353,7 +353,7 @@ class Template extends RenderPart {
                 element.setAttribute(a, String(values[i]));
                 break;
         }
-        placeholder.value = value[i];
+        placeholder.value = values[i];
       }else{
         do{
           if(walker.currentNode instanceof Text) continue;
