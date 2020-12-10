@@ -18,7 +18,6 @@ class TestComponent extends Component {
     }
   }
   render(state){
-    console.log(state);
     return html`
       <div id='he' @click=${e => this.dispatch('update')}>hhhhh</div>
       <ul>

@@ -107,7 +107,7 @@ class ValueArray {
     let D = new Array(m + 1);
     for(let i = 0; i <= m; i++){
       D[i] = new Array(n + 1);
-      for(let j = 0; j <= n; j++) D[i][j] = { d: j, from: [0, j-1] };
+      for(let j = 0; j <= n; j++) D[i][j] = { d: j, from:[i, j-1] };
       D[i][0] = {
         d: i,
         from: [i-1, 0]
@@ -120,53 +120,61 @@ class ValueArray {
             case D[i - 1][j].d:
               D[i][j] = {
                 d: D[i-1][j].d + 1,
-                from: [i-1, j]
+                from: [i-1, j],
               }
               break;
             case D[i][j - 1].d:
               D[i][j] = {
                 d: D[i][j-1].d + 1,
-                from: [i, j-1]
+                from: [i, j-1],
               }
               break;
             case D[i - 1][j - 1].d:
               D[i][j] = {
-                d: D[i][j].d + 1,
-                from: [i-1, j-1]
+                d: D[i][j].d,
+                from: [i - 1, j - 1]
               }
               break;
           }
         }else{
-          if(D[i-1][j] + 1){
+          if(D[i-1][j].d + 1 < D[i][j - 1].d + 1){
             D[i][j] = {
               d: D[i-1][j].d + 1,
-              from: [i-1, j]
+              from: [i - 1, j]
             }
           }else{
             D[i][j] = {
               d: D[i][j-1].d + 1,
-              from: [i, j-1]
+              from: [i, j - 1],
             }
           }
         }
       }
     }
-    let i=this.values.length;
-    let j=value_arr.values.length;
-    const new_temp = [];
-    while(i>0 || j>0){
+    let i = this.values.length; 
+    let j = value_arr.values.length;
+    while(i>0||j>0){
       const m = D[i][j].from[0];
       const n = D[i][j].from[1];
-      if(i-1 == m && j - 1 == n){
-        i--;
-        j--;
-        new_temp.unshift(this.values[i]);
-        if(new_temp[0] instanceof TemplateValue) new_temp[0].update(value_arr.values[j].args);
-      }else if(i-1 == m && j == n){
-        i--;
+      D[m][n].next = [i, j];
+      i = m;
+      j = n;
+    }
+    i=0; j=0;
+    const new_temp = [];
+    while(i<this.values.length || j<value_arr.values.length){
+
+      const m = D[i][j].next[0];
+      const n = D[i][j].next[1];
+      if(i + 1 == m && j + 1 == n){
+        new_temp.push(this.values[i]);
+        if(new_temp[new_temp.length - 1] instanceof TemplateValue) new_temp[new_temp.length - 1].update(value_arr.values[j].args);
+        i++;
+        j++;
+      }else if(i + 1 == m && j == n){
         this.values[i].template.remove();
-      }else if(i == m && j-1 == n){
-        j--;
+        i++;
+      }else if(i == m && j + 1 == n){
         if(new_temp.length == 0){
           const walker = document.createTreeWalker(this.container.fragment);
           do{
@@ -183,11 +191,12 @@ class ValueArray {
           }while(walker.nextNode());
           value_arr.values[j].fragment = walker.currentNode.parentNode;
         }else{
-          new_temp[0].template.insertBefore(value_arr.values[j].template);
+          new_temp[new_temp.length - 1].template.insertAfter(value_arr.values[i].template);
           value_arr.values[j].template.fragment = new_temp[0].template.fragment;
           if(value_arr.values[j] instanceof TemplateValue) value_arr.values[j].update(value_arr.values[j].args);
         }
-        new_temp.unshift(value_arr.values[j]);
+        new_temp.push(value_arr.values[j]);
+        j++;
       }else{
         break;
       }
@@ -239,15 +248,15 @@ class RenderPart {
       }
     } while(walker.nextNode());
   }
-  insertBefore(template){
+  insertAfter(template){
     const walker = document.createTreeWalker(this.fragment);
     while(walker.nextNode()){
       let current = walker.currentNode;
-      if(current instanceof Comment && current.data.trim() == 'node-'+this.hash+'-start'){
+      if(current instanceof Comment && current.data.trim() == 'node-'+this.hash+'-end'){
         if(current.parentNode){
-          current.parentNode.insertBefore(template.fragment, current);
+          current.parentNode.insertBefore(template.fragment, current.nextSibling);
         }else{
-          this.fragment.insertBefore(template.fragment, current);
+          this.fragment.insertBefore(template.fragment, current.nextSibling);
         }
         break;
       }
