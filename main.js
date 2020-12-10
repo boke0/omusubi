@@ -336,7 +336,7 @@ class Template extends RenderPart {
         switch(a[0]) {
             case "@":
                 element.removeEventListener(a.slice(1), placeholder.value);
-                element.addEventListener(a.slice(1), value[i]);
+                element.addEventListener(a.slice(1), values[i]);
                 break;
             case ".":
                 element[a.slice(1)] = values[i];
