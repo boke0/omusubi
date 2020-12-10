@@ -191,7 +191,7 @@ class ValueArray {
           }while(walker.nextNode());
           value_arr.values[j].fragment = walker.currentNode.parentNode;
         }else{
-          new_temp[new_temp.length - 1].template.insertAfter(value_arr.values[i].template);
+          new_temp[new_temp.length - 1].template.insertAfter(value_arr.values[j].template);
           value_arr.values[j].template.fragment = new_temp[0].template.fragment;
           if(value_arr.values[j] instanceof TemplateValue) value_arr.values[j].update(value_arr.values[j].args);
         }

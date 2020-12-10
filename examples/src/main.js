@@ -1,50 +1,31 @@
 import {Component, html} from '../../main.js';
 
 class TestComponent extends Component {
-  init(){
-    return {
-      arr: ['']
-    }
+  init() {
+      return {
+          select: 0,
+          sounds: new Array(16).fill(0),
+          name: 'label'
+      }
   }
-  update(state) {
-    return {
-      arr: state.arr.concat([''])
-    }
-  }
-  dup(state, i) {
-    state.arr[i] = state.arr[i] + state.arr[i];
-    return {
-      arr: state.arr
-    }
+  select(state, i) {
+      state.select = i;
+      return state;
   }
   render(state){
     return html`
-      <div id='he' @click=${e => this.dispatch('update')}>hhhhh</div>
-      <ul>
-        ${state.arr.map((_, i) => html`
-          <li
-            @click=${e => this.dispatch('dup', i)}
-            class=${
-            i%15 == 0
-              ?'fizzbuzz'
-              : i%5 == 0
-                ? 'buzz'
-                : i%3 == 0
-                  ? 'fizz'
-                  : i
-            } data-id=${i%2==0?'even':'odd'}>
-          ${
-            i%15 == 0
-              ?'fizzbuzz'
-              : i%5 == 0
-                ? 'buzz'
-                : i%3 == 0
-                  ? 'fizz'
-                  : i
-            }
-          </li>
-        `)}
-      </ul>
+        <div id="title">
+        </div>
+        <div id='buttons'>
+            ${state.sounds.map((s, i) => {
+              return html`
+                <button
+                    data-id=${i}
+                    ?selected=${state.select == i}
+                    @click=${e => this.dispatch('select', i)}
+                ></button>
+            `})}
+        </div>
     `;
   }
 }
