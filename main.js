@@ -49,8 +49,8 @@ export class Component extends HTMLElement{
   }
   init(){}
   render(){ return html``; }
-  dispatch(action, ...args){
-    this.state = this[action](this.state, ...args);
+  async dispatch(action, ...args){
+    this.state = await this[action](this.state, ...args);
     const {values} = this.render(this.state);
     this.template._update(...values);
   }

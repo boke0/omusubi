@@ -8,9 +8,13 @@ class TestComponent extends Component {
           name: 'label'
       }
   }
-  select(state, i) {
-      state.select = i;
-      return state;
+  async select(state, i) {
+    return new Promise((resolve, reject) => {
+      setTimeout(_ => {
+        state.select = i;
+        resolve(state);
+      }, i*1000);
+    });
   }
   render(state){
     return html`
@@ -23,7 +27,9 @@ class TestComponent extends Component {
                     data-id=${i}
                     ?selected=${state.select == i}
                     @click=${e => this.dispatch('select', i)}
-                ></button>
+                >
+                  ${i}
+                </button>
             `})}
         </div>
     `;
