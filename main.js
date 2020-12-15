@@ -104,12 +104,15 @@ export class Component extends HTMLElement{
   async dispatch(action, ...args){
     this.store.update(await this[action](this.store.proxy(), ...args));
     const {values} = this.render(this.store.proxy());
+    if(this.beforeUpdate) this.beforeUpdate();
     this.template._update(...values);
+    if(this.afterUpdate) this.afterUpdate();
   }
 }
 
 export class ProviderComponent extends Component {
-  afterUpdate() {
+  async connectedCallback() {
+    await super.connectedCallback();
     const walker = document.createTreeWalker(this.template.fragment);
     while(walker.nextNode()){
       if(walker.currentNode.store) walker.currentNode.store.setContext(this.store);
