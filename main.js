@@ -28,31 +28,92 @@ export function html(strings, ...values){
   return new RawHTMLTagFuncOutput(strings, values)
 }
 
+export class Store{
+  constructor(state = {}, element = null) {
+    this.context = null;
+    this.state = state;
+    this.element = element;
+  }
+  setElement(element) {
+    this.element = element;
+  }
+  setContext(store) {
+    this.context = store;
+    new Proxy(this.context, {
+      set: (target, prop, value) => {
+        if(prop == 'state') {
+          Reflect.set(target, prop, value);
+        }
+      }
+    });
+  }
+  update(state) {
+    this.state = state;
+  }
+  proxy() {
+    return new Proxy(this.state, {
+      get: (target, prop, receiver) => {
+        if(prop == '$context'){
+          return this.context ? this.context.proxy() : null;
+        }
+        return Reflect.get(target, prop, receiver);
+      }
+    });
+  }
+}
+
 export class Component extends HTMLElement{
   constructor() {
     super();
+    this.store = new Store();
     this.attachShadow({mode: 'open'});
   }
   static get styles() {
-    return [new CSSStyleSheet()];
+    return [];
   }
-  connectedCallback(){
-    this.state = this.init();
-    const {strings, values} = this.render(this.state);
+  onupdatecontext(state) {
+    return {...state};
+  }
+  async connectedCallback(){
+    this.store.update(await this.init())
+    const {strings, values} = this.render(this.store.proxy());
     if(this.template == null) {
       this.template = new Template(strings);
+      if(this.updateTemplate) this.updateTemplate(this.template.fragment);
       this.shadowRoot.appendChild(this.template.fragment);
       this.template.fragment = this.shadowRoot;
+      /** Recoverly code until adoptedStyleSheet support will come in firefox. */
+      for(const s of this.constructor.styles){
+        const style = document.createElement('style');
+        style.innerHTML = s;
+        this.shadowRoot.appendChild(style);
+      }
+      /** Recoverly code until adoptedStyleSheet support will come in firefox. */
+      /**
       this.shadowRoot.adoptedStyleSheets = this.constructor.styles;
+      */
     }
+    if(this.beforeUpdate) this.beforeUpdate();
     this.template._update(...values);
+    if(this.afterUpdate) this.afterUpdate();
   }
-  init(){}
+  init(){
+    return {}
+  }
   render(){ return html``; }
   async dispatch(action, ...args){
-    this.state = await this[action](this.state, ...args);
-    const {values} = this.render(this.state);
+    this.store.update(await this[action](this.store.proxy(), ...args));
+    const {values} = this.render(this.store.proxy());
     this.template._update(...values);
+  }
+}
+
+export class ProviderComponent extends Component {
+  afterUpdate() {
+    const walker = document.createTreeWalker(this.template.fragment);
+    while(walker.nextNode()){
+      if(walker.currentNode.store) walker.currentNode.store.setContext(this.store);
+    }
   }
 }
 
@@ -171,7 +232,18 @@ class ValueArray {
       const n = D[i][j].next[1];
       if(i + 1 == m && j + 1 == n){
         new_temp.push(this.values[i]);
-        if(new_temp[new_temp.length - 1] instanceof TemplateValue) new_temp[new_temp.length - 1].update(value_arr.values[j].args);
+        if(new_temp[new_temp.length - 1] instanceof TemplateValue) {
+          let tmp = new_temp[new_temp.length - 1];
+          tmp.update(value_arr.values[j].args);
+          if(tmp.fragment instanceof Node){
+            const walker = document.createTreeWalker(tmp.fragment);
+            while(walker.nextNode()) {
+              if(walker.currentNode instanceof Component) {
+                walker.currentNode.dispatch('onupdatecontext');
+              }
+            }
+          }
+        }
         i++;
         j++;
       }else if(i + 1 == m && j == n){
@@ -337,7 +409,6 @@ class Template extends RenderPart {
     }
   }
   _update(...values){
-    this.arg_hash = hash(this.strings.join('')+values.map(e => String(e)).join(''));
     const walker = document.createTreeWalker(this.fragment);
     for(let i = 0; i<this.placeholder.length; i++){
       const placeholder = this.placeholder[i];

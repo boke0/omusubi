@@ -1,6 +1,10 @@
-import {Component, html} from '../../main.js';
+import {Component, ProviderComponent, html} from '../../main.js';
+import styles from './style.css';
 
-class TestComponent extends Component {
+class MainComponent extends ProviderComponent {
+  static get styles() {
+    return [styles];
+  }
   init() {
       return {
           select: 0,
@@ -12,7 +16,8 @@ class TestComponent extends Component {
     return new Promise((resolve, reject) => {
       setTimeout(_ => {
         state.select = i;
-        resolve(state);
+        state.sounds[i] = i;
+        resolve({...state});
       }, i*1000);
     });
   }
@@ -23,17 +28,26 @@ class TestComponent extends Component {
         <div id='buttons'>
             ${state.sounds.map((s, i) => {
               return html`
-                <button
+                <sub-component
                     data-id=${i}
                     ?selected=${state.select == i}
                     @click=${e => this.dispatch('select', i)}
                 >
-                  ${i}
-                </button>
+                </sub-component>
             `})}
         </div>
     `;
   }
 }
 
-customElements.define('test-component', TestComponent);
+class SubComponent extends Component {
+  render(state) {
+    return html`
+      <style> :host([selected]) { color: tomato; } </style>
+      <div>${state.$context.sounds[this.dataset.id]}</div>
+      `;
+  }
+}
+
+customElements.define('main-component', MainComponent);
+customElements.define('sub-component', SubComponent);
