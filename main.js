@@ -96,6 +96,7 @@ export class Component extends HTMLElement{
     if(this.beforeUpdate) this.beforeUpdate();
     this.template._update(...values);
     if(this.afterUpdate) this.afterUpdate();
+    if(this.afterConnect) this.afterConnect();
   }
   init(){
     return {}
