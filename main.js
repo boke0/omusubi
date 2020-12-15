@@ -68,7 +68,6 @@ export class Component extends HTMLElement{
     return {...state};
   }
   async connectedCallback(){
-    console.log(this.constructor.name);
     this.store.update(await this.init())
     const {strings, values} = this.render(this.store.proxy());
     if(this.template == null) {
@@ -86,11 +85,11 @@ export class Component extends HTMLElement{
       this.shadowRoot.adoptedStyleSheets = this.constructor.styles;
       */
     }
+    if(this.firstUpdate) this.firstUpdate();
     if(this.beforeUpdate) this.beforeUpdate();
     this.template._update(...values);
     this.setContext(this.template.fragment);
     if(this.afterUpdate) this.afterUpdate();
-    if(this.afterConnect) this.afterConnect();
   }
   setContext(template) {
     const walker = document.createTreeWalker(template);
@@ -109,6 +108,7 @@ export class Component extends HTMLElement{
     const {values} = this.render(this.store.proxy());
     if(this.beforeUpdate) this.beforeUpdate();
     this.template._update(...values);
+    this.setContext(this.template.fragment);
     if(this.afterUpdate) this.afterUpdate();
   }
 }
@@ -120,7 +120,6 @@ export class ProviderComponent extends Component {
       if(walker.currentNode.store){
         walker.currentNode.store.setContext(this.store);
       }
-      console.log(walker.currentNode.childNodes);
       if(walker.currentNode.childNodes.length > 0){
         this.setContext(walker.currentNode);
       }

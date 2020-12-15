@@ -42,6 +42,11 @@ class MainComponent extends ProviderComponent {
 }
 
 class SubComponent extends Component {
+  init() {
+    return {
+      status: 0
+    };
+  }
   render(state) {
     return html`
       <style> :host([selected]) { color: tomato; } </style>
