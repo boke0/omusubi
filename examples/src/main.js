@@ -22,6 +22,7 @@ class MainComponent extends ProviderComponent {
     });
   }
   render(state){
+    console.log(this.constructor.name, 'render');
     return html`
         <div id="title">
         </div>

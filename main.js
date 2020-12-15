@@ -39,13 +39,6 @@ export class Store{
   }
   setContext(store) {
     this.context = store;
-    new Proxy(this.context, {
-      set: (target, prop, value) => {
-        if(prop == 'state') {
-          Reflect.set(target, prop, value);
-        }
-      }
-    });
   }
   update(state) {
     this.state = state;
@@ -75,11 +68,11 @@ export class Component extends HTMLElement{
     return {...state};
   }
   async connectedCallback(){
+    console.log(this.constructor.name);
     this.store.update(await this.init())
     const {strings, values} = this.render(this.store.proxy());
     if(this.template == null) {
       this.template = new Template(strings);
-      if(this.updateTemplate) this.updateTemplate(this.template.fragment);
       this.shadowRoot.appendChild(this.template.fragment);
       this.template.fragment = this.shadowRoot;
       /** Recoverly code until adoptedStyleSheet support will come in firefox. */
@@ -95,8 +88,17 @@ export class Component extends HTMLElement{
     }
     if(this.beforeUpdate) this.beforeUpdate();
     this.template._update(...values);
+    this.setContext(this.template.fragment);
     if(this.afterUpdate) this.afterUpdate();
     if(this.afterConnect) this.afterConnect();
+  }
+  setContext(template) {
+    const walker = document.createTreeWalker(template);
+    while(walker.nextNode()){
+      if(walker.currentNode.store){
+        walker.currentNode.store.setContext(this.store.context);
+      }
+    }
   }
   init(){
     return {}
@@ -112,11 +114,16 @@ export class Component extends HTMLElement{
 }
 
 export class ProviderComponent extends Component {
-  async connectedCallback() {
-    await super.connectedCallback();
-    const walker = document.createTreeWalker(this.template.fragment);
+  setContext(template) {
+    const walker = document.createTreeWalker(template);
     while(walker.nextNode()){
-      if(walker.currentNode.store) walker.currentNode.store.setContext(this.store);
+      if(walker.currentNode.store){
+        walker.currentNode.store.setContext(this.store);
+      }
+      console.log(walker.currentNode.childNodes);
+      if(walker.currentNode.childNodes.length > 0){
+        this.setContext(walker.currentNode);
+      }
     }
   }
 }
