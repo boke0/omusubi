@@ -14,11 +14,7 @@ module.exports = {
         test: /\.s[ac]ss$/i,
         use: [
           {
-            loader:'constructable-style-loader',
-            options: {
-              purge: true,
-              content: ['**/*.js']
-            }
+            loader:'css-loader'
           },
           {
             loader:'postcss-loader',
@@ -46,6 +42,5 @@ module.exports = {
         { from: "img", to: "img"},
       ],
     }),
-    new WriteFilePlugin()
   ]
 }

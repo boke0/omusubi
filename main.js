@@ -28,13 +28,42 @@ export function html(strings, ...values){
   return new RawHTMLTagFuncOutput(strings, values)
 }
 
+export class Dispatcher extends Function {
+  constructor(element, store) {
+    super();
+    this.element = element;
+    this.store = store;
+    return new Proxy(this, {
+      apply(target, thisArg, args) {
+        return target.dispatch(...args);
+      }
+    });
+  }
+  async dispatch(action, ...args) {
+    this.store.update(await this[action](this.store.proxy(), ...args));
+  }
+  init(){
+    return {}
+  }
+  updatecontext(state){
+    return {...state}
+  }
+  proxy() {
+    return new Proxy(this, {
+      get: (target, prop, receiver) => {
+        if(prop == '$context'){
+          return this.element.context ? this.element.context.dispatcher.proxy() : null;
+        }
+        return Reflect.get(target, prop, receiver);
+      }
+    });
+  }
+}
+
 export class Store{
-  constructor(state = {}, element = null) {
+  constructor(element, state = {}) {
     this.context = null;
     this.state = state;
-    this.element = element;
-  }
-  setElement(element) {
     this.element = element;
   }
   setContext(store) {
@@ -42,12 +71,13 @@ export class Store{
   }
   update(state) {
     this.state = state;
+    this.element.update();
   }
   proxy() {
     return new Proxy(this.state, {
       get: (target, prop, receiver) => {
         if(prop == '$context'){
-          return this.context ? this.context.proxy() : null;
+          return this.element.context ? this.element.context.store.proxy() : null;
         }
         return Reflect.get(target, prop, receiver);
       }
@@ -56,20 +86,34 @@ export class Store{
 }
 
 export class Component extends HTMLElement{
+  static get dispatcher() { return Dispatcher; }
   constructor() {
     super();
-    this.store = new Store();
+    this.store = new Store(this);
+    this.dispatcher = new this.constructor.dispatcher(this, this.store);
     this.attachShadow({mode: 'open'});
   }
   static get styles() {
     return [];
   }
-  onupdatecontext(state) {
-    return {...state};
-  }
   async connectedCallback(){
-    this.store.update(await this.init())
-    const {strings, values} = this.render(this.store.proxy());
+    this.dispatcher('init');
+  }
+  setContext(template) {
+    const walker = document.createTreeWalker(template);
+    while(walker.nextNode()){
+      walker.currentNode.context = this.context;
+      if(walker.currentNode.childNodes.length > 0){
+        this.setContext(walker.currentNode);
+      }
+      if(walker.currentNode instanceof Component) {
+        walker.currentNode.setContext(walker.currentNode.shadowRoot);
+      }
+    }
+  }
+  render(){ return html``; }
+  async update(){
+    const {strings, values} = this.render(this.store.proxy(), this.dispatcher.proxy());
     if(this.template == null) {
       this.template = new Template(strings);
       this.shadowRoot.appendChild(this.template.fragment);
@@ -85,30 +129,9 @@ export class Component extends HTMLElement{
       this.shadowRoot.adoptedStyleSheets = this.constructor.styles;
       */
     }
-    if(this.firstUpdate) this.firstUpdate();
     if(this.beforeUpdate) this.beforeUpdate();
     this.template._update(...values);
-    this.setContext(this.template.fragment);
-    if(this.afterUpdate) this.afterUpdate();
-  }
-  setContext(template) {
-    const walker = document.createTreeWalker(template);
-    while(walker.nextNode()){
-      if(walker.currentNode.store){
-        walker.currentNode.store.setContext(this.store.context);
-      }
-    }
-  }
-  init(){
-    return {}
-  }
-  render(){ return html``; }
-  async dispatch(action, ...args){
-    this.store.update(await this[action](this.store.proxy(), ...args));
-    const {values} = this.render(this.store.proxy());
-    if(this.beforeUpdate) this.beforeUpdate();
-    this.template._update(...values);
-    this.setContext(this.template.fragment);
+    this.setContext(this.shadowRoot);
     if(this.afterUpdate) this.afterUpdate();
   }
 }
@@ -117,11 +140,12 @@ export class ProviderComponent extends Component {
   setContext(template) {
     const walker = document.createTreeWalker(template);
     while(walker.nextNode()){
-      if(walker.currentNode.store){
-        walker.currentNode.store.setContext(this.store);
-      }
+      walker.currentNode.context = this;
       if(walker.currentNode.childNodes.length > 0){
         this.setContext(walker.currentNode);
+      }
+      if(walker.currentNode instanceof Component) {
+        walker.currentNode.setContext(walker.currentNode.shadowRoot);
       }
     }
   }
@@ -249,7 +273,7 @@ class ValueArray {
             const walker = document.createTreeWalker(tmp.fragment);
             while(walker.nextNode()) {
               if(walker.currentNode instanceof Component) {
-                walker.currentNode.dispatch('onupdatecontext');
+                walker.currentNode.dispatcher('updatecontext');
               }
             }
           }

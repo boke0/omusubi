@@ -23,9 +23,9 @@ class Features extends Component {
             </p>
           </om-feature>
           <om-feature>
-            <h3 slot='title'>The Elm Architecture</h3>
+            <h3 slot='title'>The Flux Architecture</h3>
             <p slot='content'>
-              Omusubi.js is desined while respecting The Elm Architecture. You can make components which have less side-effects.
+              Omusubi.js is desined while respecting The Flux Architecture. You can make components which have less side-effects.
             </p>
           </om-feature>
         </div>

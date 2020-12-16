@@ -1,10 +1,7 @@
-import {Component, ProviderComponent, html} from '../../main.js';
+import {Component, ProviderComponent, Dispatcher, html} from '../../main.js';
 import styles from './style.css';
 
-class MainComponent extends ProviderComponent {
-  static get styles() {
-    return [styles];
-  }
+class MainDispatcher extends Dispatcher {
   init() {
       return {
           select: 0,
@@ -21,8 +18,16 @@ class MainComponent extends ProviderComponent {
       }, i*1000);
     });
   }
-  render(state){
-    console.log(this.constructor.name, 'render');
+}
+
+class MainComponent extends ProviderComponent {
+  static get dispatcher() {
+    return MainDispatcher;
+  }
+  static get styles() {
+    return [styles];
+  }
+  render(state, dispatch){
     return html`
         <div id="title">
         </div>
@@ -32,7 +37,7 @@ class MainComponent extends ProviderComponent {
                 <sub-component
                     data-id=${i}
                     ?selected=${state.select == i}
-                    @click=${e => this.dispatch('select', i)}
+                    @click=${e => dispatch('select', i)}
                 >
                 </sub-component>
             `})}
@@ -41,17 +46,23 @@ class MainComponent extends ProviderComponent {
   }
 }
 
-class SubComponent extends Component {
+class SubDispatcher extends Dispatcher {
   init() {
     return {
       status: 0
     };
   }
+}
+
+class SubComponent extends Component {
+  static get dispatcher() {
+    return SubDispatcher;
+  }
   render(state) {
     return html`
       <style> :host([selected]) { color: tomato; } </style>
       <div>${state.$context.sounds[this.dataset.id]}</div>
-      `;
+    `;
   }
 }
 

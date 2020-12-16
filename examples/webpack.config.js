@@ -10,7 +10,7 @@ module.exports = {
         test: /\.css$/i,
         loader: 'css-loader',
       }
-    ]
+    ],
   },
   devServer: {
     contentBase: `${__dirname}`,
