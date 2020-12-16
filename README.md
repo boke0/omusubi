@@ -11,7 +11,8 @@ View component library using WebComponents.
 
 ```javascript
 import {Component, html, defineComponent} from 'omusubi-js';
-class FizzBuzz extends Component {
+
+class FizzBuzzDispatcher extends Dispatcher {
     init() {
         return {
             arr: [0]
@@ -22,10 +23,14 @@ class FizzBuzz extends Component {
             arr: state.arr.concat([state.arr.length]);
         }
     }
-    render(state) {
+}
+
+class FizzBuzz extends Component {
+    static dispatcher = FizzBuzzDispatcher;
+    render(state, dispatch) {
         return html`
             <h1>Hello, FizzBuzz!</h1>
-            <button @click=${e => this.dispatch('update')}>Count!</button>
+            <button @click=${e => dispatch('update')}>Count!</button>
             <ul>
                 ${state.arr.map(i => html`
                     <li>${
