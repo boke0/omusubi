@@ -48,11 +48,11 @@ export class Dispatcher extends Function {
   updatecontext(state){
     return {...state}
   }
-  prop(key, default){
-    return this.element[key] ? this.element[key] : default;
+  prop(key, default_value){
+    return this.element[key] ? this.element[key] : default_value;
   }
-  attr(key, default){
-    return this.element.hasAttribute(key) ? this.element.getAttribute(key) : default;
+  attr(key, default_value){
+    return this.element.hasAttribute(key) ? this.element.getAttribute(key) : default_value;
   }
   proxy() {
     return new Proxy(this, {
