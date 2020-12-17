@@ -103,7 +103,8 @@ export class Component extends HTMLElement{
     return [];
   }
   async connectedCallback(){
-    this.dispatcher('init');
+    await this.dispatcher('init');
+    if(this.afterFirstUpdate) this.afterFirstUpdate();
   }
   setContext(template) {
     const walker = document.createTreeWalker(template);
