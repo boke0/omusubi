@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "",
   "main": "main.js",
+  "types": "omusubi.d.ts",
   "directories": {
     "doc": "docs",
     "example": "examples"
