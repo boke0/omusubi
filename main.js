@@ -118,6 +118,12 @@ export class Component extends HTMLElement{
       }
     }
   }
+  get $contextStore() {
+    return this.context.store.proxy();
+  }
+  get $contextDispatch() {
+    return this.context.dispatch.proxy();
+  }
   render(){ return html``; }
   async update(){
     const {strings, values} = this.render(this.store.proxy(), this.dispatcher.proxy());
