@@ -273,6 +273,7 @@ class ValueArray {
               while(walker.nextNode()) {
                 if(walker.currentNode instanceof Component) {
                   walker.currentNode.dispatch('updatecontext');
+                  dispatch_update(walker.currentNode.shadowRoot);
                 }
                 if(walker.currentNode.childNodes.length > 0) {
                   dispatch_update(walker.currentNode);
