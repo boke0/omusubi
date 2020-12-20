@@ -1,6 +1,6 @@
 {
   "name": "omusubi-js",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "",
   "main": "main.js",
   "types": "omusubi.d.ts",
