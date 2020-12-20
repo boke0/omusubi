@@ -268,17 +268,18 @@ class ValueArray {
           let tmp = new_temp[new_temp.length - 1];
           tmp.update(value_arr.values[j].args);
           if(tmp.fragment instanceof Node){
-            (d => {
+            function dispatch_update(d){
               const walker = document.createTreeWalker(d);
               while(walker.nextNode()) {
                 if(walker.currentNode instanceof Component) {
                   walker.currentNode.dispatch('updatecontext');
                 }
                 if(walker.currentNode.childNodes.length > 0) {
-                  arguments.callee(walker.currentNode);
+                  dispatch_update(walker.currentNode);
                 }
               }
-            })(tmp.fragment);
+            }
+            dispatch_update(tmp.fragment);
           }
         }
         i++;
