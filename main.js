@@ -35,7 +35,7 @@ export class Store{
   }
   update(state) {
     this.state = state;
-    this.element.update();
+    this.element._update();
   }
 }
 
@@ -94,7 +94,7 @@ export class Component extends HTMLElement{
     }, ...args));
   }
   render(){ return html``; }
-  async update(){
+  async _update(){
     const {strings, values} = this.render({
       ...this,
       state: this.state,
