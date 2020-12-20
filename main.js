@@ -62,7 +62,7 @@ export class Component extends HTMLElement{
   init() {
     return {};
   }
-  updatecontext(state){
+  updatecontext({state}){
     return {...state}
   }
   $ctx(contextId) {
