@@ -9,47 +9,36 @@ declare module 'omusubi-js' {
   export function defineComponent(tagname: string, options?: ElementDefinitionOptions): (wrapped: typeof Component) => void;
 
   export function html(strings: string[], values: string[]): new () => RawHTMLTagFuncOutput;
-
-  export class Dispatcher extends Function {
-    constructor(element: unknown, store: unknown);
-    
-    dispatch(action: string, ...args: string[]): Promise<void>;
-
-    init(): void;
-
-    prop(key: string, default_value: string): string;
-
-    attr(key: string, default_value: string): string;
-
-    updatecontext(state: unknown): object;
-
-    proxy(): object;
-  }
   
   export class Store<T extends object> {
     constructor(element: unknown, state?: T);
 
-    setContext(store: unknown): void;
-
     update(state: T): void;
-
-    proxy(): object;
   }
   
   export class Component extends HTMLElement {
-    static dispatcher: typeof Dispatcher;
     static styles: unknown[];
 
+    state: object;
+
+    dispatch(action: string, ...args: unknown[]): Promise<void>;
+
     connectedCallback(): Promise<void>;
+
+    $ctx(contextId: string): ProviderComponent;
     
+    updatecontext(state: object): object;
+
     setContext(template: Template): void;
 
-    render(state: object, dispatch: unknown): new () => RawHTMLTagFuncOutput;
+    render(props: object): new () => RawHTMLTagFuncOutput;
 
     update(): Promise<void>;
   }
   
   export class ProviderComponent extends Component {
+    providerId: string;
+
     setContext(template: Template): void;
   }
 

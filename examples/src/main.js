@@ -1,7 +1,13 @@
 import {Component, ProviderComponent, Dispatcher, html} from '../../main.js';
 import styles from './style.css';
 
-class MainDispatcher extends Dispatcher {
+class MainComponent extends ProviderComponent {
+  static get styles() {
+    return [styles];
+  }
+  get providerId() {
+    return 'main';
+  }
   init() {
       return {
           select: 0,
@@ -9,7 +15,7 @@ class MainDispatcher extends Dispatcher {
           name: 'label'
       }
   }
-  async select(state, i) {
+  async select({state}, i) {
     return new Promise((resolve, reject) => {
       setTimeout(_ => {
         state.select = i;
@@ -18,16 +24,7 @@ class MainDispatcher extends Dispatcher {
       }, i*1000);
     });
   }
-}
-
-class MainComponent extends ProviderComponent {
-  static get dispatcher() {
-    return MainDispatcher;
-  }
-  static get styles() {
-    return [styles];
-  }
-  render(state, dispatch){
+  render({state, dispatch}){
     return html`
         <div id="title">
         </div>
@@ -46,22 +43,16 @@ class MainComponent extends ProviderComponent {
   }
 }
 
-class SubDispatcher extends Dispatcher {
+class SubComponent extends Component {
   init() {
     return {
       status: 0
     };
   }
-}
-
-class SubComponent extends Component {
-  static get dispatcher() {
-    return SubDispatcher;
-  }
-  render(state) {
+  render({state, $ctx}) {
     return html`
       <style> :host([selected]) { color: tomato; } </style>
-      <div>${state.$context.sounds[this.dataset.id]}</div>
+      <div>${$ctx('main').state.sounds[this.dataset.id]}</div>
     `;
   }
 }

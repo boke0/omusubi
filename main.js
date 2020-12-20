@@ -28,105 +28,70 @@ export function html(strings, ...values){
   return new RawHTMLTagFuncOutput(strings, values)
 }
 
-export class Dispatcher extends Function {
-  constructor(element, store) {
-    super();
-    this.element = element;
-    this.store = store;
-    return new Proxy(this, {
-      apply(target, thisArg, args) {
-        return target.dispatch(...args);
-      }
-    });
-  }
-  async dispatch(action, ...args) {
-    this.store.update(await this[action](this.store.proxy(), ...args));
-  }
-  init(){
-    return {}
-  }
-  updatecontext(state){
-    return {...state}
-  }
-  prop(key, default_value){
-    return this.element[key] ? this.element[key] : default_value;
-  }
-  attr(key, default_value){
-    return this.element.hasAttribute(key) ? this.element.getAttribute(key) : default_value;
-  }
-  proxy() {
-    return new Proxy(this, {
-      get: (target, prop, receiver) => {
-        if(prop == '$context'){
-          return this.element.context ? this.element.context.dispatcher.proxy() : null;
-        }
-        return Reflect.get(target, prop, receiver);
-      }
-    });
-  }
-}
-
 export class Store{
   constructor(element, state = {}) {
-    this.context = null;
     this.state = state;
     this.element = element;
-  }
-  setContext(store) {
-    this.context = store;
   }
   update(state) {
     this.state = state;
     this.element.update();
   }
-  proxy() {
-    return new Proxy(this.state, {
-      get: (target, prop, receiver) => {
-        if(prop == '$context'){
-          return this.element.context ? this.element.context.store.proxy() : null;
-        }
-        return Reflect.get(target, prop, receiver);
-      }
-    });
-  }
 }
 
 export class Component extends HTMLElement{
-  static get dispatcher() { return Dispatcher; }
   constructor() {
     super();
     this.store = new Store(this);
-    this.dispatcher = new this.constructor.dispatcher(this, this.store);
+    this.context = {};
     this.attachShadow({mode: 'open'});
   }
   static get styles() {
     return [];
   }
   async connectedCallback(){
-    await this.dispatcher('init');
+    await this.dispatch('init');
     if(this.afterFirstUpdate) this.afterFirstUpdate();
+  }
+  updatecontext(state){
+    return {...state}
+  }
+  $ctx(contextId) {
+    return this.context[contextId];
   }
   setContext(template) {
     const walker = document.createTreeWalker(template);
     while(walker.nextNode()){
-      walker.currentNode.context = this.context;
+      if(walker.currentNode instanceof Component) {
+        for(const k of Object.keys(this.context)){
+          walker.currentNode.context[k] = this.context[k];
+        }
+        walker.currentNode.setContext(walker.currentNode.shadowRoot);
+      }
       if(walker.currentNode.childNodes.length > 0){
         this.setContext(walker.currentNode);
       }
-      if(walker.currentNode instanceof Component) {
-        walker.currentNode.setContext(walker.currentNode.shadowRoot);
-      }
     }
   }
-  get $contextStore() {
-    return this.context.store.proxy();
+  get state() {
+    return this.store.state;
   }
-  get $contextDispatch() {
-    return this.context.dispatch.proxy();
+  async dispatch(action, ...args) {
+    this.store.update(await this[action]({
+      ...this,
+      state: this.state,
+      $ctx: contextId => this.context[contextId],
+      dispatch: (..._args) => Reflect.apply(this.dispatch, this, args)
+    }, ...args));
   }
   render(){ return html``; }
   async update(){
-    const {strings, values} = this.render(this.store.proxy(), this.dispatcher.proxy());
+    const {strings, values} = this.render({
+      ...this,
+      state: this.state,
+      $ctx: contextId => this.context[contextId],
+      dispatch: (...args) => Reflect.apply(this.dispatch, this, args)
+    })
     if(this.template == null) {
       this.template = new Template(strings);
       this.shadowRoot.appendChild(this.template.fragment);
@@ -150,15 +115,23 @@ export class Component extends HTMLElement{
 }
 
 export class ProviderComponent extends Component {
+  get providerId() {
+    return this.hasAttribute('provider-id')
+      ? this.getAttribute('provider-id')
+      : undefined;
+  }
+  set providerId(value) {
+    this.setAttribute('provider-id', value);
+  }
   setContext(template) {
     const walker = document.createTreeWalker(template);
     while(walker.nextNode()){
-      walker.currentNode.context = this;
+      if(walker.currentNode instanceof Component) {
+        walker.currentNode.context[this.providerId] = this;
+        walker.currentNode.setContext(walker.currentNode.shadowRoot);
+      }
       if(walker.currentNode.childNodes.length > 0){
         this.setContext(walker.currentNode);
-      }
-      if(walker.currentNode instanceof Component) {
-        walker.currentNode.setContext(walker.currentNode.shadowRoot);
       }
     }
   }
@@ -286,7 +259,7 @@ class ValueArray {
             const walker = document.createTreeWalker(tmp.fragment);
             while(walker.nextNode()) {
               if(walker.currentNode instanceof Component) {
-                walker.currentNode.dispatcher('updatecontext');
+                walker.currentNode.dispatch('updatecontext');
               }
             }
           }
