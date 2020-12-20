@@ -136,6 +136,9 @@ export class ProviderComponent extends Component {
     const walker = document.createTreeWalker(template);
     while(walker.nextNode()){
       if(walker.currentNode instanceof Component) {
+        for(const k of Object.keys(this.context)) {
+          walker.currentNode.context[k] = this.context[k];
+        }
         walker.currentNode.context[this.providerId] = this;
         walker.currentNode.setContext(walker.currentNode.shadowRoot);
       }
