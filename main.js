@@ -53,6 +53,15 @@ export class Component extends HTMLElement{
     await this.dispatch('init');
     if(this.afterFirstUpdate) this.afterFirstUpdate();
   }
+  attr(key, default_value = undefined) {
+    return this.hasAttribute(key) ? this.getAttribute(key) : default_value;
+  }
+  prop(key, default_value = undefined) {
+    return this[key] ? this[key] : default_value;
+  }
+  init() {
+    return {};
+  }
   updatecontext(state){
     return {...state}
   }
